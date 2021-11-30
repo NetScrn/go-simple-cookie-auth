@@ -1,0 +1,1 @@
+select id, email, password_digest, confirmed from users where id = ?;

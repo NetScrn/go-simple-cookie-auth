@@ -1,0 +1,7 @@
+backend/cert.pem
+backend/key.pem
+backend/security/passwords_salt.txt
+idea/
+backend/.idea/
+frontend/
+.vscode/

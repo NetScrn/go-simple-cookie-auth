@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/netscrn/gocookieauth/middleware"
 	"net/http"
 	"time"
 
-	"github.com/netscrn/gocookieauth/controllers"
 	"github.com/netscrn/gocookieauth/data"
+	"github.com/netscrn/gocookieauth/web"
 )
 
 func main() {
@@ -46,11 +47,11 @@ func setUpdDB(username, password, dbName, params string) (*sql.DB, error) {
 	return db, nil
 }
 
-func setUpMux(db *sql.DB) *http.ServeMux {
+func setUpMux(db *sql.DB) http.Handler {
 	ur := data.NewUserRepo(db)
-	uc := controllers.NewUsersController(ur)
+	uc := web.NewUsersController(ur)
 
 	m := http.NewServeMux()
 	m.HandleFunc("/user", uc.CreateUser)
-	return m
+	return middleware.CORS(middleware.CommonHeaders(m))
 }

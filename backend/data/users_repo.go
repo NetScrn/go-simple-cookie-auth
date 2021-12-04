@@ -27,8 +27,7 @@ func NewUserRepo(db *sql.DB) UsersRepo {
 	}
 }
 
-func (ur UsersRepo) GetUserByID(userId int) (*User, error) {
-	ctx := context.Background()
+func (ur UsersRepo) GetUserByID(ctx context.Context, userId int) (*User, error) {
 	row := ur.db.QueryRowContext(ctx, getUserByIdQuery, userId)
 	if row.Err() == sql.ErrNoRows {
 		return nil, ErrNoUserFound
@@ -45,8 +44,7 @@ func (ur UsersRepo) GetUserByID(userId int) (*User, error) {
 	return &u, nil
 }
 
-func (ur UsersRepo) SaveUser(user *User) error {
-	ctx := context.Background()
+func (ur UsersRepo) SaveUser(ctx context.Context, user *User) error {
 	res, err := ur.db.ExecContext(ctx, saveUserQuery, user.PasswordDigest, user.Email, user.IsConfirmed)
 	if err != nil {
 		var mysqlError *mysql.MySQLError

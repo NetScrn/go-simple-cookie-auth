@@ -30,10 +30,11 @@ func (sc *serverCaller) call(req *http.Request) (*http.Response, error) {
 var sc serverCaller
 
 func TestMain(m *testing.M) {
-	db, err := setUpdDB("root", "ss", "simple_auth_test", "multiStatements=true")
+	db, err := setUpdDB("root", "ss", "", "multiStatements=true")
 	if err != nil {
 		panic(err)
 	}
+	_, err = db.Exec("use simple_auth_test")
 	_, err = db.Exec("drop database simple_auth_test")
 	_, err = db.Exec("create database simple_auth_test")
 	_, err = db.Exec("use simple_auth_test")
@@ -121,6 +122,7 @@ func TestResponseHeaders(t *testing.T)  {
 		n  string
 		ev string
 	}{
+		{n: "Accept",                  ev: "application/json"},
 		{n: "Content-Type",            ev: "application/json;charset=utf-8"},
 		{n: "X-Content-Type-Options",  ev: "nosniff"},
 		{n: "X-Frame-Options",         ev: "DENY"},

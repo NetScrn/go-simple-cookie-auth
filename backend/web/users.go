@@ -1,4 +1,4 @@
-package controllers
+package web
 
 import (
 	"encoding/json"
@@ -10,36 +10,18 @@ import (
 	"github.com/netscrn/gocookieauth/security"
 )
 
-type UsersManger interface {
-	GetUserByID(userId int) (*data.User, error)
-	SaveUser(user *data.User) error
-}
-
 type UsersController struct {
-	um UsersManger
+	um data.UsersManger
 }
 
-func NewUsersController(um UsersManger) UsersController {
+func NewUsersController(um data.UsersManger) UsersController {
 	return UsersController{
 		um: um,
 	}
 }
 
 func (uc UsersController) CreateUser(w http.ResponseWriter, r *http.Request)  {
-	h := w.Header()
-	h.Set("Content-Type", "application/json;charset=utf-8")
-	h.Set("Access-Control-Allow-Origin", "*")
-	h.Set("Access-Control-Allow-Headers","*")
-	h.Set("X-Content-Type-Options", "nosniff")
-	h.Set("X-Frame-Options", "DENY")
-	h.Set("X-XSS-Protection", "0")
-	h.Set("Cache-Control", "no-store")
-	h.Set("Content-Security-Policy","default-src 'none'; frame-ancestors 'none'; sandbox")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	ctx := r.Context()
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -83,7 +65,7 @@ func (uc UsersController) CreateUser(w http.ResponseWriter, r *http.Request)  {
 		Email: regUserData.Email,
 		PasswordDigest: digest,
 	}
-	err = uc.um.SaveUser(&u)
+	err = uc.um.SaveUser(ctx, &u)
 
 	if err == data.ErrSuchEmailIsAlreadyExists {
 		w.WriteHeader(http.StatusConflict)	

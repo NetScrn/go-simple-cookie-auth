@@ -1,0 +1,10 @@
+development:
+  username: "root"
+  password: "ss"
+  db_name:  "simple_auth"
+  params:   ""
+test:
+  username: "root"
+  password: "ss"
+  db_name:  "simple_auth_test"
+  params:   "multiStatements=true"

@@ -1,4 +1,4 @@
-package web
+package controllers
 
 import (
 	"encoding/json"
@@ -6,15 +6,15 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/netscrn/gocookieauth/data"
-	"github.com/netscrn/gocookieauth/security"
+	"github.com/netscrn/gocookieauth/data/users"
+	"github.com/netscrn/gocookieauth/web/security"
 )
 
 type UsersController struct {
-	um data.UsersManger
+	um users.Manger
 }
 
-func NewUsersController(um data.UsersManger) UsersController {
+func NewUsersController(um users.Manger) UsersController {
 	return UsersController{
 		um: um,
 	}
@@ -61,13 +61,13 @@ func (uc UsersController) CreateUser(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	u := data.User{
+	u := users.User{
 		Email: regUserData.Email,
 		PasswordDigest: digest,
 	}
 	err = uc.um.SaveUser(ctx, &u)
 
-	if err == data.ErrSuchEmailIsAlreadyExists {
+	if err == users.ErrSuchEmailIsAlreadyExists {
 		w.WriteHeader(http.StatusConflict)	
 		_, err = w.Write([]byte(fmt.Sprintf(`{"error": %d, "error_desc": "%v"}`, 0, err)))
 		return

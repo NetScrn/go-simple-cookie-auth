@@ -1,57 +1,38 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/netscrn/gocookieauth/middleware"
 	"net/http"
+	"os"
 	"time"
 
-	"github.com/netscrn/gocookieauth/data"
+	"github.com/netscrn/gocookieauth/data/database"
 	"github.com/netscrn/gocookieauth/web"
 )
 
 func main() {
-	db, err := setUpdDB("root", "ss", "simple_auth", "")
+	env, exists := os.LookupEnv("SIMPLE_AUTH_ENV")
+	if !exists {
+		env = "development"
+	}
+
+	db, err := database.SetUpdDB(env)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
-	m := setUpMux(db)
-
+	h := web.SetUpMainHandler(db)
 	s := http.Server{
 		Addr: ":8080",
 		ReadTimeout:  60 * time.Second,
 		WriteTimeout: 60 * time.Second,
 		IdleTimeout:  120 * time.Second,
-		Handler: m,
+		Handler: h,
 	}
 
 	err = s.ListenAndServeTLS("cert.pem", "key.pem")
 	if err != nil {
 		panic(err)
 	}
-}
-
-func setUpdDB(username, password, dbName, params string) (*sql.DB, error) {
-	dbAddress := fmt.Sprintf("%s:%s@/%s?%s", username, password, dbName, params)
-	db, err := sql.Open("mysql", dbAddress)
-	if err != nil {
-		return nil, err
-	}
-	db.SetConnMaxLifetime(3 * time.Second)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-	return db, nil
-}
-
-func setUpMux(db *sql.DB) http.Handler {
-	ur := data.NewUserRepo(db)
-	uc := web.NewUsersController(ur)
-
-	m := http.NewServeMux()
-	m.HandleFunc("/user", uc.CreateUser)
-	return middleware.CORS(middleware.CommonHeaders(m))
 }

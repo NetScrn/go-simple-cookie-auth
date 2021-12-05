@@ -8,11 +8,10 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/netscrn/gocookieauth/data/database"
+	"github.com/netscrn/gocookieauth/web"
 )
-
-
-//go:embed db/ddl.sql
-var dbSchemaSetup string
 
 type serverCaller struct {
 	url    string
@@ -30,22 +29,14 @@ func (sc *serverCaller) call(req *http.Request) (*http.Response, error) {
 var sc serverCaller
 
 func TestMain(m *testing.M) {
-	db, err := setUpdDB("root", "ss", "", "multiStatements=true")
+	db, err := database.SetUpdDB("test")
 	if err != nil {
 		panic(err)
 	}
-	_, err = db.Exec("use simple_auth_test")
-	_, err = db.Exec("drop database simple_auth_test")
-	_, err = db.Exec("create database simple_auth_test")
-	_, err = db.Exec("use simple_auth_test")
-	_, err = db.Exec(dbSchemaSetup)
-	if err != nil {
-		panic(err)
-	}
-	
-	mux := setUpMux(db)
 
-	server := httptest.NewServer(mux)
+	h := web.SetUpMainHandler(db)
+
+	server := httptest.NewServer(h)
 	sc = serverCaller{
 		url: server.URL,
 		client: server.Client(),

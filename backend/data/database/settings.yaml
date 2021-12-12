@@ -2,9 +2,9 @@ development:
   username: "root"
   password: "ss"
   db_name:  "simple_auth"
-  params:   ""
+  params:   "parseTime=true"
 test:
   username: "root"
   password: "ss"
   db_name:  "simple_auth_test"
-  params:   "multiStatements=true"
+  params:   "multiStatements=true&parseTime=true"

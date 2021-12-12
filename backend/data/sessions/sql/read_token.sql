@@ -1,0 +1,1 @@
+select uuid, user_id, active, expiry, data from sessions where uuid = ?;

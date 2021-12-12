@@ -38,16 +38,16 @@ func TestMain(m *testing.M) {
 
 	server := httptest.NewServer(h)
 	sc = serverCaller{
-		url: server.URL,
+		url:    server.URL,
 		client: server.Client(),
 	}
 	defer server.Close()
 	m.Run()
 }
 
-func TestCreateUser(t *testing.T)  {
+func TestCreateUser(t *testing.T) {
 	reqBody := `{"email": "ss@gmail.com", "password": "111111"}`
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, sc.url + "/user", strings.NewReader(reqBody))
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, sc.url+"/user", strings.NewReader(reqBody))
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		t.Fatalf("can't create request: %v", err)
@@ -81,9 +81,9 @@ func TestCreateUser(t *testing.T)  {
 	}
 }
 
-func TestSecurityOnlyAcceptJson(t *testing.T)  {
+func TestSecurityOnlyAcceptJson(t *testing.T) {
 	reqBody := `{"email": "ss@gmail.com", "password": "111111"}`
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, sc.url + "/user", strings.NewReader(reqBody))
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, sc.url+"/user", strings.NewReader(reqBody))
 	//req.Header.Set("Content-Type", "application/json") // testng this
 	if err != nil {
 		t.Fatalf("can't create request: %v", err)
@@ -97,10 +97,10 @@ func TestSecurityOnlyAcceptJson(t *testing.T)  {
 	}
 }
 
-func TestResponseHeaders(t *testing.T)  {
+func TestResponseHeaders(t *testing.T) {
 	reqBody := `{"email": "ss@gmail.com", "password": "111111"}`
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, sc.url + "/user", strings.NewReader(reqBody))
-	req.Header.Set("Content-Type", "application/json") // testng this
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, sc.url+"/user", strings.NewReader(reqBody))
+	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		t.Fatalf("can't create request: %v", err)
 	}
@@ -109,16 +109,16 @@ func TestResponseHeaders(t *testing.T)  {
 		t.Fatalf("can't call a server: %v", err)
 	}
 
-	headers := []struct{
+	headers := []struct {
 		n  string
 		ev string
 	}{
-		{n: "Accept",                  ev: "application/json"},
-		{n: "Content-Type",            ev: "application/json;charset=utf-8"},
-		{n: "X-Content-Type-Options",  ev: "nosniff"},
-		{n: "X-Frame-Options",         ev: "DENY"},
-		{n: "X-XSS-Protection",        ev: "0"},
-		{n: "Cache-Control",           ev: "no-store"},
+		{n: "Accept", ev: "application/json"},
+		{n: "Content-Type", ev: "application/json;charset=utf-8"},
+		{n: "X-Content-Type-Options", ev: "nosniff"},
+		{n: "X-Frame-Options", ev: "DENY"},
+		{n: "X-XSS-Protection", ev: "0"},
+		{n: "Cache-Control", ev: "no-store"},
 		{n: "Content-Security-Policy", ev: "default-src 'none'; frame-ancestors 'none'; sandbox"},
 	}
 

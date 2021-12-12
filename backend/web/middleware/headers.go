@@ -11,7 +11,12 @@ func CommonHeaders(h http.Handler) http.Handler {
 		header.Set("X-Frame-Options", "DENY")
 		header.Set("X-XSS-Protection", "0")
 		header.Set("Cache-Control", "no-store")
-		header.Set("Content-Security-Policy","default-src 'none'; frame-ancestors 'none'; sandbox")
+		header.Set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; sandbox")
+
+		if r.Header.Get("Content-Type") != "application/json" {
+			w.WriteHeader(http.StatusUnsupportedMediaType)
+			return
+		}
 
 		h.ServeHTTP(w, r)
 	})

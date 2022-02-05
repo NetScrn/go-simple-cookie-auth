@@ -123,3 +123,44 @@ func (sc SessionsController) Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Write(resBody)
 }
+
+func (sc SessionsController) Logout(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	if r.Method != "DELETE" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	_, ok := auth.TokenFromContext(ctx)
+	if !ok {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	tokenId, err := r.Cookie("u_session")
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	c := &http.Cookie{
+		Name:     "u_session",
+		Value:    "",
+		MaxAge:   -1,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	http.SetCookie(w, c)
+
+	err = sc.tm.Revoke(ctx, tokenId.Value)
+	if err == sessions.ErrNoTokenWasDeleted {
+		fmt.Printf("Logout - no token was deleted")
+	} else if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

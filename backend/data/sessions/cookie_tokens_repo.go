@@ -23,6 +23,7 @@ var revokeTokenQuery string
 var ErrTokenNotFound = errors.New("token not found")
 var ErrTokenIsNotActive = errors.New("token is not active")
 var ErrTokenIsExpired = errors.New("token is expired")
+var ErrNoTokenWasDeleted = errors.New("no token was deleted")
 
 type TokensRepo struct {
 	db *sql.DB
@@ -111,6 +112,16 @@ func (tr TokensRepo) Read(ctx context.Context, tokenId string) (Token, error) {
 }
 
 func (tr TokensRepo) Revoke(ctx context.Context, tokenId string) error {
-	_, err := tr.db.ExecContext(ctx, revokeTokenQuery, tokenId)
+	r, err := tr.db.ExecContext(ctx, revokeTokenQuery, tokenId)
+	if err != nil {
+		return err
+	}
+	ra, err := r.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if ra == 0 {
+		return ErrNoTokenWasDeleted
+	}
 	return err
 }

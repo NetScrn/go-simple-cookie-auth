@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/yaml.v3"
 )
 
@@ -19,8 +20,8 @@ var dbSchemaSetup string
 type dbParams struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
-	DBName string   `yaml:"db_name"`
-	Params string   `yaml:"params"`
+	DBName   string `yaml:"db_name"`
+	Params   string `yaml:"params"`
 }
 
 func SetUpdDB(env string) (*sql.DB, error) {
@@ -60,5 +61,5 @@ func SetUpdDB(env string) (*sql.DB, error) {
 			return nil, fmt.Errorf("failed to drop test db: %w", err)
 		}
 	}
- 	return db, nil
+	return db, nil
 }

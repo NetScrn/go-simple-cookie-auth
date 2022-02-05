@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"os"
 	"time"
@@ -24,11 +23,11 @@ func main() {
 
 	h := web.SetUpMainHandler(db)
 	s := http.Server{
-		Addr: ":8080",
+		Addr:         ":8080",
 		ReadTimeout:  60 * time.Second,
 		WriteTimeout: 60 * time.Second,
 		IdleTimeout:  120 * time.Second,
-		Handler: h,
+		Handler:      h,
 	}
 
 	err = s.ListenAndServeTLS("cert.pem", "key.pem")

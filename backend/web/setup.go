@@ -21,6 +21,7 @@ func SetUpMainHandler(db *sql.DB) http.Handler {
 	m := http.NewServeMux()
 	m.HandleFunc("/user", uc.CreateUser)
 	m.HandleFunc("/login", sc.Login)
+	m.HandleFunc("/logout", sc.Logout)
 	m.HandleFunc("/auth-only", controllers.AuthenticatedOnly)
 
 	h := middleware.CORS(m)

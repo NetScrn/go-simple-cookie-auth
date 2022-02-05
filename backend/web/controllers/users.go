@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/netscrn/gocookieauth/data/users"
@@ -36,7 +37,7 @@ func (uc UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	userDataJson, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Printf("CreateUser - can't read req body: %v\n", err)
+		log.Printf("CreateUser - can't read req body: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -51,14 +52,14 @@ func (uc UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}{}
 	err = json.Unmarshal(userDataJson, &regUserData)
 	if err != nil {
-		fmt.Printf("CreateUser - can't parse req body json: %v\n", err)
+		log.Printf("CreateUser - can't parse req body json: %v\n", err)
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
 
 	digest, err := security.CreatePasswordHash(regUserData.Password)
 	if err != nil {
-		fmt.Printf("CreateUser - can't create password hash: %v\n", err)
+		log.Printf("CreateUser - can't create password hash: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -73,7 +74,7 @@ func (uc UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(fmt.Sprintf(`{"error": %d, "error_desc": "%v"}`, 0, err)))
 		return
 	} else if err != nil {
-		fmt.Printf("CreateUser - can't save user: %v\n", err)
+		log.Printf("CreateUser - can't save user: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	} else {

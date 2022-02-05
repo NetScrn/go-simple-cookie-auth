@@ -1,1 +1,1 @@
-delete from sessions where where uuid = ? and active = true;
+update sessions set active = false where uuid = ? and active = true;

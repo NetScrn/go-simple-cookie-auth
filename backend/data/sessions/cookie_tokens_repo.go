@@ -6,8 +6,8 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
+	"log"
 	"time"
 )
 
@@ -47,7 +47,7 @@ func (tr TokensRepo) Create(ctx context.Context, token Token) (string, error) {
 	tUuid := uuid.New().String()
 	tokenAttrsString, err := json.Marshal(token.Attributes)
 	if err != nil {
-		fmt.Println("can't marshal token attributes: ", token.Attributes)
+		log.Println("can't marshal token attributes: ", token.Attributes)
 		tokenAttrsString = nil
 	}
 
@@ -104,7 +104,7 @@ func (tr TokensRepo) Read(ctx context.Context, tokenId string) (Token, error) {
 	if len(tdbr.attrs) > 0 {
 		err = json.Unmarshal([]byte(tdbr.attrs), &token.Attributes)
 		if err != nil {
-			fmt.Printf("can't parse token attrs, uuid(%s): %v\n", tdbr.uuid, err)
+			log.Printf("can't parse token attrs, uuid(%s): %v\n", tdbr.uuid, err)
 		}
 	}
 

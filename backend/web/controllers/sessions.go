@@ -10,6 +10,7 @@ import (
 	auth "github.com/netscrn/gocookieauth/web/middleware/authentication"
 	"github.com/netscrn/gocookieauth/web/security"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 )
@@ -41,7 +42,7 @@ func (sc SessionsController) Login(w http.ResponseWriter, r *http.Request) {
 
 	loginDataJson, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Printf("Login - can't read req body: %v\n", err)
+		log.Printf("Login - can't read req body: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -58,7 +59,7 @@ func (sc SessionsController) Login(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(loginDataJson, &loginData)
 	if err != nil {
-		fmt.Printf("Login - can't parse req body json: %v\n", err)
+		log.Printf("Login - can't parse req body json: %v\n", err)
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
@@ -74,7 +75,7 @@ func (sc SessionsController) Login(w http.ResponseWriter, r *http.Request) {
 
 	ok, err := security.IsPassMatchHash(loginData.Password, u.PasswordDigest)
 	if err != nil {
-		fmt.Printf("Login - can't compare password hashes: %v\n", err)
+		log.Printf("Login - can't compare password hashes: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	} else if !ok {
@@ -98,7 +99,7 @@ func (sc SessionsController) Login(w http.ResponseWriter, r *http.Request) {
 
 	tokenId, err := sc.tm.Create(ctx, token)
 	if err != nil {
-		fmt.Printf("Login - can't create token: %v\n", err)
+		log.Printf("Login - can't create token: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -156,8 +157,9 @@ func (sc SessionsController) Logout(w http.ResponseWriter, r *http.Request) {
 
 	err = sc.tm.Revoke(ctx, tokenId.Value)
 	if err == sessions.ErrNoTokenWasDeleted {
-		fmt.Printf("Logout - no token was deleted")
+		log.Printf("Logout - no token was deleted")
 	} else if err != nil {
+		log.Printf("Logout - error: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

@@ -23,14 +23,14 @@ func main() {
 
 	h := web.SetUpMainHandler(db)
 	s := http.Server{
-		Addr:         ":8080",
+		Addr:         ":3001",
 		ReadTimeout:  60 * time.Second,
 		WriteTimeout: 60 * time.Second,
 		IdleTimeout:  120 * time.Second,
 		Handler:      h,
 	}
 
-	err = s.ListenAndServeTLS("cert.pem", "key.pem")
+	err = s.ListenAndServe()
 	if err != nil {
 		panic(err)
 	}

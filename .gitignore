@@ -1,6 +1,7 @@
 backend/cert.pem
 backend/key.pem
 backend/web/security/passwords_salt.txt
+backend/data/database/settings.yaml
 .idea/
 backend/.idea/
 frontend/

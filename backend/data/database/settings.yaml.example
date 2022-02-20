@@ -1,10 +1,10 @@
 development:
-  username: "ss"
-  password: "Sergey9537!"
+  username: "user"
+  password: "pass"
   db_name:  "simple_auth"
   params:   "parseTime=true"
 test:
-  username: "root"
-  password: "ss"
+  username: "user"
+  password: "user"
   db_name:  "simple_auth_test"
   params:   "multiStatements=true&parseTime=true"

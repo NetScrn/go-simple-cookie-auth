@@ -38,7 +38,7 @@ func (ur UsersRepo) GetUserByEmail(ctx context.Context, email string) (User, err
 	}
 
 	err := row.Scan(&u.Id, &u.Email, &u.PasswordDigest, &u.IsConfirmed)
-	if err == sql.ErrNoRows {
+	if err == sql.ErrNoRows { // todo: use errors.Is()
 		return u, ErrNoUserFound
 	} else if err != nil {
 		return u, err
@@ -55,7 +55,8 @@ func (ur UsersRepo) GetUserByID(ctx context.Context, userId int) (User, error) {
 	}
 
 	err := row.Scan(&u.Id, &u.Email, &u.PasswordDigest, &u.IsConfirmed)
-	if err == sql.ErrNoRows {
+	if err == sql.
+	{
 		return u, ErrNoUserFound
 	} else if err != nil {
 		return u, err

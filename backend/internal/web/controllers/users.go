@@ -1,22 +1,27 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/netscrn/gocookieauth/internal/data/users"
+	auth "github.com/netscrn/gocookieauth/internal/web/middleware/authentication"
+	"github.com/netscrn/gocookieauth/pkg/security"
 	"io/ioutil"
 	"log"
 	"net/http"
-
-	"github.com/netscrn/gocookieauth/data/users"
-	auth "github.com/netscrn/gocookieauth/web/middleware/authentication"
-	"github.com/netscrn/gocookieauth/web/security"
 )
 
-type UsersController struct {
-	um users.Manger
+type UsersManger interface {
+	GetUserByEmail(ctx context.Context, email string) (users.User, error)
+	SaveUser(ctx context.Context, user *users.User) error
 }
 
-func NewUsersController(um users.Manger) UsersController {
+type UsersController struct {
+	um UsersManger
+}
+
+func NewUsersController(um UsersManger) UsersController {
 	return UsersController{
 		um: um,
 	}

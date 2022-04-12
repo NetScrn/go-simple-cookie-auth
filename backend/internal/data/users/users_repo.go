@@ -20,17 +20,24 @@ var saveUserQuery string
 var ErrNoUserFound = errors.New("no user is found")
 var ErrSuchEmailIsAlreadyExists = errors.New("such email is already exists")
 
-type UsersRepo struct {
+type User struct {
+	Id             int    `json:"id"`
+	Email          string `json:"email"`
+	PasswordDigest string `json:"password_digest"`
+	IsConfirmed    bool   `json:"is_confirmed"`
+}
+
+type Repo struct {
 	db *sql.DB
 }
 
-func NewUserRepo(db *sql.DB) UsersRepo {
-	return UsersRepo{
+func NewUserRepo(db *sql.DB) Repo {
+	return Repo{
 		db: db,
 	}
 }
 
-func (ur UsersRepo) GetUserByEmail(ctx context.Context, email string) (User, error) {
+func (ur Repo) GetUserByEmail(ctx context.Context, email string) (User, error) {
 	u := User{}
 	row := ur.db.QueryRowContext(ctx, getUserByEmailQuery, email)
 	if row.Err() != nil {
@@ -38,7 +45,7 @@ func (ur UsersRepo) GetUserByEmail(ctx context.Context, email string) (User, err
 	}
 
 	err := row.Scan(&u.Id, &u.Email, &u.PasswordDigest, &u.IsConfirmed)
-	if err == sql.ErrNoRows { // todo: use errors.Is()
+	if errors.Is(err, sql.ErrNoRows) {
 		return u, ErrNoUserFound
 	} else if err != nil {
 		return u, err
@@ -47,7 +54,7 @@ func (ur UsersRepo) GetUserByEmail(ctx context.Context, email string) (User, err
 	return u, nil
 }
 
-func (ur UsersRepo) GetUserByID(ctx context.Context, userId int) (User, error) {
+func (ur Repo) GetUserByID(ctx context.Context, userId int) (User, error) {
 	u := User{}
 	row := ur.db.QueryRowContext(ctx, getUserByIdQuery, userId)
 	if row.Err() != nil {
@@ -55,7 +62,7 @@ func (ur UsersRepo) GetUserByID(ctx context.Context, userId int) (User, error) {
 	}
 
 	err := row.Scan(&u.Id, &u.Email, &u.PasswordDigest, &u.IsConfirmed)
-	if err == sql.sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return u, ErrNoUserFound
 	} else if err != nil {
 		return u, err
@@ -64,7 +71,7 @@ func (ur UsersRepo) GetUserByID(ctx context.Context, userId int) (User, error) {
 	return u, nil
 }
 
-func (ur UsersRepo) SaveUser(ctx context.Context, user *User) error {
+func (ur Repo) SaveUser(ctx context.Context, user *User) error {
 	res, err := ur.db.ExecContext(ctx, saveUserQuery, user.PasswordDigest, user.Email, user.IsConfirmed)
 	if err != nil {
 		var mysqlError *mysql.MySQLError

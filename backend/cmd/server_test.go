@@ -3,15 +3,16 @@ package main
 import (
 	"context"
 	_ "embed"
+	"github.com/netscrn/gocookieauth/internal/data/database"
+	"github.com/netscrn/gocookieauth/internal/web"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/netscrn/gocookieauth/data/database"
-	"github.com/netscrn/gocookieauth/web"
 )
+
+const env = "test"
 
 type serverCaller struct {
 	url    string
@@ -29,12 +30,12 @@ func (sc *serverCaller) call(req *http.Request) (*http.Response, error) {
 var sc serverCaller
 
 func TestMain(m *testing.M) {
-	db, err := database.SetUpdDB("test")
+	db, err := database.SetUpdDB(env)
 	if err != nil {
 		panic(err)
 	}
 
-	h := web.SetUpMainHandler(db)
+	h := web.SetUpMainHandler(db, env)
 
 	server := httptest.NewServer(h)
 	sc = serverCaller{

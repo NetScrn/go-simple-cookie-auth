@@ -1,12 +1,11 @@
 package main
 
 import (
+	"github.com/netscrn/gocookieauth/internal/data/database"
+	"github.com/netscrn/gocookieauth/internal/web"
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/netscrn/gocookieauth/data/database"
-	"github.com/netscrn/gocookieauth/web"
 )
 
 func main() {
@@ -21,7 +20,7 @@ func main() {
 	}
 	defer db.Close()
 
-	h := web.SetUpMainHandler(db)
+	h := web.SetUpMainHandler(db, env)
 	s := http.Server{
 		Addr:         ":3001",
 		ReadTimeout:  60 * time.Second,
@@ -29,6 +28,7 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 		Handler:      h,
 	}
+	defer s.Close()
 
 	err = s.ListenAndServe()
 	if err != nil {

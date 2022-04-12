@@ -2,16 +2,15 @@ package web
 
 import (
 	"database/sql"
+	"github.com/netscrn/gocookieauth/internal/data/sessions"
+	"github.com/netscrn/gocookieauth/internal/data/users"
+	"github.com/netscrn/gocookieauth/internal/web/controllers"
+	"github.com/netscrn/gocookieauth/internal/web/middleware"
+	auth "github.com/netscrn/gocookieauth/internal/web/middleware/authentication"
 	"net/http"
-
-	"github.com/netscrn/gocookieauth/data/sessions"
-	"github.com/netscrn/gocookieauth/data/users"
-	"github.com/netscrn/gocookieauth/web/controllers"
-	"github.com/netscrn/gocookieauth/web/middleware"
-	auth "github.com/netscrn/gocookieauth/web/middleware/authentication"
 )
 
-func SetUpMainHandler(db *sql.DB) http.Handler {
+func SetUpMainHandler(db *sql.DB, env string) http.Handler {
 	ur := users.NewUserRepo(db)
 	tr := sessions.NewTokensRepo(db)
 
@@ -24,7 +23,7 @@ func SetUpMainHandler(db *sql.DB) http.Handler {
 	m.HandleFunc("/logout", sc.Logout)
 	m.HandleFunc("/auth-only", controllers.AuthenticatedOnly)
 
-	h := middleware.CORS(m)
+	h := middleware.CORS(m, env)
 	h = middleware.CommonHeaders(h)
 	h = auth.Authenticate(h, ur, tr)
 	return h

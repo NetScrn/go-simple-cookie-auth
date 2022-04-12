@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	auth "github.com/netscrn/gocookieauth/web/middleware/authentication"
+	auth "github.com/netscrn/gocookieauth/internal/web/middleware/authentication"
 	"net/http"
 )
 

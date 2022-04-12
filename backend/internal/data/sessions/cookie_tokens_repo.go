@@ -11,6 +11,12 @@ import (
 	"time"
 )
 
+type Token struct {
+	UserID     int
+	Expiry     time.Time
+	Attributes map[string]string
+}
+
 //go:embed sql/create_token.sql
 var createTokenQuery string
 

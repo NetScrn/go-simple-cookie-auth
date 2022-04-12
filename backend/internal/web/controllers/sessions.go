@@ -1,26 +1,32 @@
 package controllers
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/netscrn/gocookieauth/data/sessions"
-	"github.com/netscrn/gocookieauth/data/users"
-	auth "github.com/netscrn/gocookieauth/web/middleware/authentication"
-	"github.com/netscrn/gocookieauth/web/security"
+	"github.com/netscrn/gocookieauth/internal/data/sessions"
+	"github.com/netscrn/gocookieauth/internal/data/users"
+	auth "github.com/netscrn/gocookieauth/internal/web/middleware/authentication"
+	"github.com/netscrn/gocookieauth/pkg/security"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
 )
 
-type SessionsController struct {
-	um users.Manger
-	tm sessions.TokenManager
+type TokenManager interface {
+	Create(ctx context.Context, token sessions.Token) (string, error)
+	Revoke(ctx context.Context, tokenId string) error
 }
 
-func NewSessionController(um users.Manger, tm sessions.TokenManager) SessionsController {
+type SessionsController struct {
+	um UsersManger
+	tm TokenManager
+}
+
+func NewSessionController(um UsersManger, tm TokenManager) SessionsController {
 	return SessionsController{
 		um: um,
 		tm: tm,

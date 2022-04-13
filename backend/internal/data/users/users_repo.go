@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"github.com/VividCortex/mysqlerr"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -75,10 +76,8 @@ func (ur Repo) SaveUser(ctx context.Context, user *User) error {
 	res, err := ur.db.ExecContext(ctx, saveUserQuery, user.PasswordDigest, user.Email, user.IsConfirmed)
 	if err != nil {
 		var mysqlError *mysql.MySQLError
-		if errors.As(err, &mysqlError) {
-			if mysqlError.Number == 1062 {
-				return ErrSuchEmailIsAlreadyExists
-			}
+		if errors.As(err, &mysqlError) && mysqlError.Number == mysqlerr.ER_DUP_ENTRY {
+			return ErrSuchEmailIsAlreadyExists
 		}
 		return err
 	}
